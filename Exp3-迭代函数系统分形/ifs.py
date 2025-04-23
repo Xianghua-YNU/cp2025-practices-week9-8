@@ -2,11 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def get_fern_params():
-    """
-    返回巴恩斯利蕨的IFS参数
-    每个变换包含6个参数(a,b,c,d,e,f)和概率p
-    """
-    # TODO: 实现巴恩斯利蕨的参数
+    """返回巴恩斯利蕨的IFS参数"""
+    # 每个变换包含6个参数(a,b,c,d,e,f)和概率p
     return [
         [0.00, 0.00, 0.00, 0.16, 0.00, 0.00, 0.01],   # 茎干
         [0.85, 0.04, -0.04, 0.85, 0.00, 1.60, 0.85],   # 小叶片
@@ -15,26 +12,15 @@ def get_fern_params():
     ]
 
 def get_tree_params():
-    """
-    返回概率树的IFS参数
-    每个变换包含6个参数(a,b,c,d,e,f)和概率p
-    """
-    # TODO: 实现概率树的参数 
+    """返回概率树的IFS参数""" 
     return [
         [0.00, 0.00, 0.00, 0.50, 0.00, 0.00, 0.10],    # 树干
         [0.42, -0.42, 0.42, 0.42, 0.00, 0.20, 0.45],   # 左分支
         [0.42, 0.42, -0.42, 0.42, 0.00, 0.20, 0.45]    # 右分支
     ]
 
-
-
 def apply_transform(point, params):
-    """
-    应用单个变换到点
-    :param point: 当前点坐标(x,y)
-    :param params: 变换参数[a,b,c,d,e,f,p]
-    :return: 变换后的新坐标(x',y')
-    """
+    """应用单个变换到点"""
     x, y = point
     a, b, c, d, e, f, _ = params
     return a*x + b*y + e, c*x + d*y + f
@@ -44,7 +30,7 @@ def run_ifs(ifs_params, num_points=100000, num_skip=100):
     运行IFS迭代生成点集
     :param ifs_params: IFS参数列表
     :param num_points: 总点数
-    :param num_skip: 跳过前n个点
+    :param num_skip: 跳过前n个点(避免初始不稳定)
     :return: 生成的点坐标数组
     """
     # 提取概率用于随机选择
@@ -67,9 +53,8 @@ def run_ifs(ifs_params, num_points=100000, num_skip=100):
             
     return points
 
-
-def plot_ifs(points, title="IFS Fractal"):
-    """
+def plot_ifs(points, title="IFS Fractal", save_path=None):
+    """绘制IFS分形并保存为PNG"""
     plt.figure(figsize=(8, 8))
     plt.scatter(points[:,0], points[:,1], s=1, c='green', alpha=0.75)
     plt.title(title)
@@ -84,9 +69,9 @@ if __name__ == "__main__":
     # 生成并绘制巴恩斯利蕨
     fern_params = get_fern_params()
     fern_points = run_ifs(fern_params)
-    plot_ifs(fern_points, "Barnsley Fern")
+    plot_ifs(fern_points, "Barnsley Fern", "barnsley_fern.png")
     
     # 生成并绘制概率树
     tree_params = get_tree_params()
     tree_points = run_ifs(tree_params)
-    plot_ifs(tree_points, "Probability Tree")
+    plot_ifs(tree_points, "Probability Tree", "probability_tree.png")
