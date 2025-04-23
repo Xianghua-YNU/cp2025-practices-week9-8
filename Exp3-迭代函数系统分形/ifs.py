@@ -39,7 +39,7 @@ def run_ifs(ifs_params, num_points=100000, num_skip=100):
     
     # 初始化
     point = (0.5, 0)  # 初始点
-    points = np.zeros((num_points, 2))
+    points = np.zeros((num_points, 2), dtype=object)
     
     # 迭代生成点
     for i in range(num_points + num_skip):
