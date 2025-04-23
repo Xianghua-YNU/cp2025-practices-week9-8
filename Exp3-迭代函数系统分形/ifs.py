@@ -23,7 +23,7 @@ def apply_transform(point, params):
     """应用单个变换到点"""
     x, y = point
     a, b, c, d, e, f, _ = params
-    return a*x + b*y + e, c*x + d*y + f
+    return (a * x + b * y + e, c * x + d * y + f)
 
 def run_ifs(ifs_params, num_points=100000, num_skip=100):
     """
