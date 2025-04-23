@@ -7,7 +7,13 @@ def get_fern_params():
     每个变换包含6个参数(a,b,c,d,e,f)和概率p
     """
     # TODO: 实现巴恩斯利蕨的参数
-    pass
+    return [
+        [0.00, 0.00, 0.00, 0.16, 0.00, 0.00, 0.01],  # T1 (Stem)
+        [0.85, 0.04, -0.04, 0.85, 0.00, 1.60, 0.85],  # T2 (Successively smaller leaflets)
+        [0.20, -0.26, 0.23, 0.22, 0.00, 1.60, 0.07],  # T3 (Largest left-hand leaflet)
+        [-0.15, 0.28, 0.26, 0.24, 0.00, 0.44, 0.07]  # T4 (Largest right-hand leaflet)
+    ]
+
 
 def get_tree_params():
     """
@@ -15,7 +21,12 @@ def get_tree_params():
     每个变换包含6个参数(a,b,c,d,e,f)和概率p
     """
     # TODO: 实现概率树的参数 
-    pass
+    return [
+        [0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.1],  # T1 (Trunk/Base scaling)
+        [0.42, -0.42, 0.42, 0.42, 0.0, 0.2, 0.45],  # T2 (Left Branch)
+        [0.42, 0.42, -0.42, 0.42, 0.0, 0.2, 0.45]  # T3 (Right Branch)
+    ]
+
 
 def apply_transform(point, params):
     """
@@ -25,7 +36,11 @@ def apply_transform(point, params):
     :return: 变换后的新坐标(x',y')
     """
     # TODO: 实现变换公式
-    pass
+    x, y = point
+    a, b, c, d, e, f, _ = params
+    x_new = a * x + b * y + e
+    y_new = c * x + d * y + f
+    return x_new, y_new
 
 def run_ifs(ifs_params, num_points=100000, num_skip=100):
     """
@@ -36,7 +51,17 @@ def run_ifs(ifs_params, num_points=100000, num_skip=100):
     :return: 生成的点坐标数组
     """
     # TODO: 实现混沌游戏算法
-    pass
+    x, y = (0, 0)
+    x_coords = []
+    y_coords = []
+    probabilities = [param[-1] for param in ifs_params]
+    for i in range(num_points):
+        transform_index = random.choices(range(len(ifs_params)), probabilities)[0]
+        x, y = apply_transform((x, y), ifs_params[transform_index])
+        if i > num_skip:
+            x_coords.append(x)
+            y_coords.append(y)
+    return x_coords, y_coords
 
 def plot_ifs(points, title="IFS Fractal"):
     """
@@ -45,7 +70,20 @@ def plot_ifs(points, title="IFS Fractal"):
     :param title: 图像标题
     """
     # TODO: 实现分形绘制
-    pass
+    title="IFS Fractal", filename="ifs_fractal.png"):
+    """
+    绘制IFS分形
+    :param x_coords: 点的x坐标列表
+    :param y_coords: 点的y坐标列表
+    :param title: 图像标题
+    :param filename: 保存图像的文件名
+    """
+    plt.scatter(x_coords, y_coords, s=1, alpha=0.5)
+    plt.title(title)
+    plt.axis('equal')
+    plt.axis('off')
+    plt.savefig(filename)
+    plt.show()
 
 if __name__ == "__main__":
     # 生成并绘制巴恩斯利蕨
