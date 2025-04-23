@@ -75,4 +75,3 @@ if __name__ == "__main__":
     tree_params = get_tree_params()
     tree_points = run_ifs(tree_params)
     plot_ifs(tree_points, "Probability Tree", "probability_tree.png")
-     # 生成并绘制概率树
