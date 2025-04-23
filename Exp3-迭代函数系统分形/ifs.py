@@ -23,7 +23,7 @@ def apply_transform(point, params):
     """应用单个变换到点"""
     x, y = point
     a, b, c, d, e, f, _ = params
-    return (a * x + b * y + e, c * x + d * y + f)
+    return a*x + b*y + e, c*x + d*y + f
 
 def run_ifs(ifs_params, num_points=100000, num_skip=100):
     """
@@ -33,41 +33,36 @@ def run_ifs(ifs_params, num_points=100000, num_skip=100):
     :param num_skip: 跳过前n个点(避免初始不稳定)
     :return: 生成的点坐标数组
     """
+    # 提取概率用于随机选择
     probs = [p[-1] for p in ifs_params]
     indices = np.arange(len(ifs_params))
-    point = np.array([0.5, 0])  # 初始点用numpy数组表示
-    points = []
-    for _ in range(num_points + num_skip):
+    
+    # 初始化
+    point = (0.5, 0)  # 初始点
+    points = np.zeros((num_points, 2))
+    
+    # 迭代生成点
+    for i in range(num_points + num_skip):
+        # 随机选择变换
         idx = np.random.choice(indices, p=probs)
-        a, b, c, d, e, f, _ = ifs_params[idx]
-        x, y = point
-        x_new = a * x + b * y + e
-        y_new = c * x + d * y + f
-        point = np.array([x_new, y_new])
-        if _ >= num_skip:
-            points.append(point)
-    return np.array(points)
-
+        point = apply_transform(point, ifs_params[idx])
+        
+        # 跳过初始不稳定点
+        if i >= num_skip:
+            points[i - num_skip] = point
+            
+    return points
 
 def plot_ifs(points, title="IFS Fractal", save_path=None):
     """绘制IFS分形并保存为PNG"""
     plt.figure(figsize=(8, 8))
-    plt.scatter(points[:, 0], points[:, 1], s=1, c='green', alpha=0.75)
+    plt.scatter(points[:,0], points[:,1], s=1, c='green', alpha=0.75)
     plt.title(title)
     plt.axis('equal')
     plt.axis('off')
+    
     if save_path:
-        dir_path = os.path.dirname(save_path)
-        if dir_path and not os.path.exists(dir_path):
-            try:
-                os.makedirs(dir_path)
-            except OSError as e:
-                print(f"创建路径 {dir_path} 失败: {e}")
-                return
-        try:
-            plt.savefig(save_path, bbox_inches='tight', dpi=300)
-        except Exception as e:
-            print(f"保存文件 {save_path} 失败: {e}")
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.show()
 
 if __name__ == "__main__":
@@ -80,4 +75,3 @@ if __name__ == "__main__":
     tree_params = get_tree_params()
     tree_points = run_ifs(tree_params)
     plot_ifs(tree_points, "Probability Tree", "probability_tree.png")
-＃ 为什么不给我发邮件
