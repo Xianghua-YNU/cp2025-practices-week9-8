@@ -61,9 +61,13 @@ def plot_ifs(points, title="IFS Fractal", save_path=None):
     plt.axis('equal')
     plt.axis('off')
     
+    import os
     if save_path:
+    dir_path = os.path.dirname(save_path)
+        if dir_path and not os.path.exists(dir_path):
+            os.makedirs(dir_path)
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
-    plt.show()
+
 
 if __name__ == "__main__":
     # 生成并绘制巴恩斯利蕨
