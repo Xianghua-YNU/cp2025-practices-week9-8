@@ -8,12 +8,11 @@ def get_fern_params():
     """
     # TODO: 实现巴恩斯利蕨的参数
     return [
-        [0.00, 0.00, 0.00, 0.16, 0.00, 0.00, 0.01],  # T1 (Stem)
-        [0.85, 0.04, -0.04, 0.85, 0.00, 1.60, 0.85],  # T2 (Successively smaller leaflets)
-        [0.20, -0.26, 0.23, 0.22, 0.00, 1.60, 0.07],  # T3 (Largest left-hand leaflet)
-        [-0.15, 0.28, 0.26, 0.24, 0.00, 0.44, 0.07]  # T4 (Largest right-hand leaflet)
+        [0.00, 0.00, 0.00, 0.16, 0.00, 0.00, 0.01],   # 茎干
+        [0.85, 0.04, -0.04, 0.85, 0.00, 1.60, 0.85],   # 小叶片
+        [0.20, -0.26, 0.23, 0.22, 0.00, 1.60, 0.07],   # 左侧大叶片
+        [-0.15, 0.28, 0.26, 0.24, 0.00, 0.44, 0.07]    # 右侧大叶片
     ]
-
 
 def get_tree_params():
     """
@@ -22,10 +21,11 @@ def get_tree_params():
     """
     # TODO: 实现概率树的参数 
     return [
-        [0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.1],  # T1 (Trunk/Base scaling)
-        [0.42, -0.42, 0.42, 0.42, 0.0, 0.2, 0.45],  # T2 (Left Branch)
-        [0.42, 0.42, -0.42, 0.42, 0.0, 0.2, 0.45]  # T3 (Right Branch)
+        [0.00, 0.00, 0.00, 0.50, 0.00, 0.00, 0.10],    # 树干
+        [0.42, -0.42, 0.42, 0.42, 0.00, 0.20, 0.45],   # 左分支
+        [0.42, 0.42, -0.42, 0.42, 0.00, 0.20, 0.45]    # 右分支
     ]
+
 
 
 def apply_transform(point, params):
@@ -35,12 +35,9 @@ def apply_transform(point, params):
     :param params: 变换参数[a,b,c,d,e,f,p]
     :return: 变换后的新坐标(x',y')
     """
-    # TODO: 实现变换公式
     x, y = point
     a, b, c, d, e, f, _ = params
-    x_new = a * x + b * y + e
-    y_new = c * x + d * y + f
-    return x_new, y_new
+    return a*x + b*y + e, c*x + d*y + f
 
 def run_ifs(ifs_params, num_points=100000, num_skip=100):
     """
@@ -50,39 +47,37 @@ def run_ifs(ifs_params, num_points=100000, num_skip=100):
     :param num_skip: 跳过前n个点
     :return: 生成的点坐标数组
     """
-    # TODO: 实现混沌游戏算法
-    x, y = (0, 0)
-    x_coords = []
-    y_coords = []
-    probabilities = [param[-1] for param in ifs_params]
-    for i in range(num_points):
-        transform_index = random.choices(range(len(ifs_params)), probabilities)[0]
-        x, y = apply_transform((x, y), ifs_params[transform_index])
-        if i > num_skip:
-            x_coords.append(x)
-            y_coords.append(y)
-    return x_coords, y_coords
+    # 提取概率用于随机选择
+    probs = [p[-1] for p in ifs_params]
+    indices = np.arange(len(ifs_params))
+    
+    # 初始化
+    point = (0.5, 0)  # 初始点
+    points = np.zeros((num_points, 2))
+    
+    # 迭代生成点
+    for i in range(num_points + num_skip):
+        # 随机选择变换
+        idx = np.random.choice(indices, p=probs)
+        point = apply_transform(point, ifs_params[idx])
+        
+        # 跳过初始不稳定点
+        if i >= num_skip:
+            points[i - num_skip] = point
+            
+    return points
+
 
 def plot_ifs(points, title="IFS Fractal"):
     """
-    绘制IFS分形
-    :param points: 点坐标数组
-    :param title: 图像标题
-    """
-    # TODO: 实现分形绘制
-    title="IFS Fractal", filename="ifs_fractal.png"):
-    """
-    绘制IFS分形
-    :param x_coords: 点的x坐标列表
-    :param y_coords: 点的y坐标列表
-    :param title: 图像标题
-    :param filename: 保存图像的文件名
-    """
-    plt.scatter(x_coords, y_coords, s=1, alpha=0.5)
+    plt.figure(figsize=(8, 8))
+    plt.scatter(points[:,0], points[:,1], s=1, c='green', alpha=0.75)
     plt.title(title)
     plt.axis('equal')
     plt.axis('off')
-    plt.savefig(filename)
+    
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.show()
 
 if __name__ == "__main__":
